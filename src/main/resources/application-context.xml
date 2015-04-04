@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+       <bean class="com.grigoriyalexeev.concertparser.service.EventService">
+              <constructor-arg>
+                     <map>
+                            <entry key-ref="mariinskyDownloader" value-ref="mariinskyExtractor"/>
+                            <entry key-ref="philharmoniaDownloader" value-ref="philharmoniaExtractor"/>
+                     </map>
+              </constructor-arg>
+       </bean>
+
+       <bean id="mariinskyDownloader" class="com.grigoriyalexeev.concertparser.service.downloader.Downloader">
+              <constructor-arg name="url" index="0" type="java.lang.String" value="http://www.mariinsky.ru/en/playbill/playbill/"/>
+              <constructor-arg name="genericToCustomQueryParamNames" index="1" type="java.util.Map">
+                     <map>
+                            <entry key="YEAR" value="year"/>
+                            <entry key="MONTH" value="month"/>
+                     </map>
+              </constructor-arg>
+              <constructor-arg name="genericQueryParamNamesToValues" index="2" type="java.util.Map">
+                     <map>
+                            <entry key="YEAR" value="#{T(org.joda.time.DateTime).now().year().getAsText()}"/>
+                            <entry key="MONTH" value="4"/>
+                     </map>
+              </constructor-arg>
+       </bean>
+       <bean id="mariinskyExtractor" class="com.grigoriyalexeev.concertparser.service.extractor.impl.MariinskyExtractor"/>
+
+       <bean id="philharmoniaDownloader" class="com.grigoriyalexeev.concertparser.service.downloader.Downloader">
+              <constructor-arg name="url" type="java.lang.String" index="0" value="http://www.philharmonia.spb.ru/en/afisha/"/>
+              <constructor-arg name="genericToCustomQueryParamNames" index="1" type="java.util.Map">
+                     <map>
+                            <entry key="YEAR" value="ev_y"/>
+                            <entry key="MONTH" value="ev_m"/>
+                            <entry key="HALL" value="ev_z"/>
+                     </map>
+              </constructor-arg>
+              <constructor-arg name="genericQueryParamNamesToValues" index="2" type="java.util.Map">
+                     <map>
+                            <entry key="YEAR" value="#{T(org.joda.time.DateTime).now().year().getAsText()}"/>
+                            <entry key="MONTH" value="#{T(org.joda.time.DateTime).now().monthOfYear().getAsText()}"/>
+                            <entry key="HALL" value="346"/> <!-- 346 = Big Hall -->
+                     </map>
+              </constructor-arg>
+       </bean>
+       <bean id="philharmoniaExtractor" class="com.grigoriyalexeev.concertparser.service.extractor.impl.PhilharmoniaExtractor"/>
+</beans>
